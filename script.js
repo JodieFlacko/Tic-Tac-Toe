@@ -26,13 +26,8 @@
     
 })() */
 
-gameboard = {
-    rows: 3,
-    columns: 3,
-    board: [],
-};
-
 const gameController = (function(){
+
     const createPlayer = function(marker = undefined){
         // if prompting second player
         let score = 0;
@@ -56,15 +51,25 @@ const gameController = (function(){
             return {playerOne, playerTwo}
     }
     
+    let players;
+    gameboard = {
+        rows: 3,
+        columns: 3,
+        board: [],
+    };
+
+
     const startGame = function(){
         //private variable
-        const players = getPlayers();
+        players = getPlayers();
         const showPlayers = (function(){
         console.log(`First player\n Name: ${players.playerOne.name} - Marker: ${players.playerOne.marker} - Score: ${players.playerOne.score}\nSecond player\n Name: ${players.playerTwo.name} - Marker: ${players.playerTwo.marker} - Score: ${players.playerTwo.score}\n`);
         })(players);
-
     }
     
+    const insertMarker = function(){
+        
+    }
 
     return { startGame }
 })();
