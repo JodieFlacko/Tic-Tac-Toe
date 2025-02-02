@@ -39,7 +39,7 @@ const gameController = (function(){
         if(marker !== undefined){
             const name = prompt('Enter second player name: ');
             marker = marker === 'X' ? "O" : "X";
-            return {name, marker}
+            return {name, marker, score}
         }
         const name = prompt('Enter first player name: ');
         let signal = true;
@@ -56,7 +56,16 @@ const gameController = (function(){
             return {playerOne, playerTwo}
     }
     
+    const startGame = function(){
+        //private variable
+        const players = getPlayers();
+        const showPlayers = (function(){
+        console.log(`First player\n Name: ${players.playerOne.name} - Marker: ${players.playerOne.marker} - Score: ${players.playerOne.score}\nSecond player\n Name: ${players.playerTwo.name} - Marker: ${players.playerTwo.marker} - Score: ${players.playerTwo.score}\n`);
+        })(players);
 
-    return { getPlayers }
+    }
+    
+
+    return { startGame }
 })();
 
