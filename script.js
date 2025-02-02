@@ -48,15 +48,11 @@ const gameController = (function(){
     const getPlayers = function(){
             playerOne = createPlayer();
             playerTwo = createPlayer(playerOne.marker);
-            return {playerOne, playerTwo}
+            return { playerOne, playerTwo }
     }
     
     let players;
-    gameboard = {
-        rows: 3,
-        columns: 3,
-        board: [],
-    };
+    gameboard = [];
 
 
     const startGame = function(){
@@ -65,10 +61,43 @@ const gameController = (function(){
         const showPlayers = (function(){
         console.log(`First player\n Name: ${players.playerOne.name} - Marker: ${players.playerOne.marker} - Score: ${players.playerOne.score}\nSecond player\n Name: ${players.playerTwo.name} - Marker: ${players.playerTwo.marker} - Score: ${players.playerTwo.score}\n`);
         })(players);
-    }
-    
-    const insertMarker = function(){
-        
+
+        const checkWinner = function(signal){
+            if(gameboard[0] === "X" && gameboard[1] === "X" && gameboard[2] === "X") {
+                signal.value = false;
+                return true;
+            }
+        }
+
+        const promptForPosition = function(player){
+            alert(`${players[player].name}'s Turn:\n`)
+            const row = prompt(`Enter the ROW where you want to put the marker: `);
+            const column = prompt(`Enter the COLUMN where you want to put the marker: `);
+            let position = row * column - 1;
+            return position;
+        }
+
+        const updateScore = function(winner){
+            winner.score++;
+        }
+
+        const insertMarker = (function(){
+            let signal = {
+                value: true,
+            }
+            while(signal.value){
+                for(let player in players){
+                    const position = promptForPosition(player);
+                    gameboard[position] = players[player].marker;
+                    if(checkWinner(signal)){
+                        const winner = players[player];
+                        updateScore(winner);
+                        console.log(players[player])
+                        break;
+                    }
+                }
+            }
+        })(players, gameboard, checkWinner, promptForPosition, updateScore);
     }
 
     return { startGame }
