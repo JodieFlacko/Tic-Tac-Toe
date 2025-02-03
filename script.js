@@ -1,41 +1,47 @@
-const gameController = (function(){
+const TicTacToe = (function(){
 
     const createPlayer = function(option){
         // if prompting second player
         let score = 0;
-        const name = prompt(`Enter ${option} player name: `);
-        if(option === "first"){
+        const name = prompt(`Enter ${option.toLowerCase()} player name: `);
+        if(option === "First"){
                 while(true){
-                marker = prompt('Enter a marker. Choose between "X" and "O": ');
-                if(marker === "X" || marker === "O") break;
+                mark = prompt('Enter a mark. Choose between "X" and "O": ');
+                if(mark === "X" || mark === "O") break;
             }
         }
-        else marker = marker === "X" ? "O" : "X";
-        return {name, marker, score}
+        else mark = mark === "X" ? "O" : "X";
+        return {name, mark, score, index: option}
     };
 
     function getPlayers(){
-        playerOne = createPlayer("first");
-        playerTwo = createPlayer("second");
+        console.log("\nChoose your names and marks!")
+        playerOne = createPlayer("First");
+        playerTwo = createPlayer("Second");
         return { playerOne, playerTwo }
     }
 
     function getPosition(player, message = ""){
-        alert(`${message}${players[player].name}'s Turn:\n`)
+        console.log(`\n${message}${player.name}'s Turn:\n`)
         let keepGoing = true;
         const pattern = /[1-3]/;
         let col, row;
         while(keepGoing){
-            row = +prompt(`Enter the ROW where you want to put the marker: `);
-            col = +prompt(`Enter the COLUMN where you want to put the marker: `);
+            row = +prompt(`Enter the ROW where you want to put the mark: `);
+            console.log(`You chose row number: ${row}`);
+            col = +prompt(`Enter the COLUMN where you want to put the mark: `);
+            console.log(`You chose col number: ${col}`);
             if(pattern.test(row) && pattern.test(col)) keepGoing = false;
-            else alert("Entered values must be numbers between 1 and 3 (included)");
+            else {
+                alert("OOPS! It seems a problem occured, have a look at the console for details.")
+                console.log("\nEntered values must be numbers between 1 and 3 (included)");
+            }
         }
         let position = (row - 1) * 3 + col - 1;
         return position;
     }
 
-    function checkWinner(marker){
+    function checkWinner(mark){
         winningLines = {
             firstRow: [0, 1, 2],
             secondRow: [3, 4, 5],
@@ -51,7 +57,7 @@ const gameController = (function(){
             //absurd proposition
             let winnerFound = true;
             winningLines[line].forEach(index => {
-                if(gameboard[index] !== marker) {
+                if(gameboard[index] !== mark) {
                     winnerFound = false;
                     return;
                 }
@@ -60,48 +66,121 @@ const gameController = (function(){
         }
     }
 
+    function checkTie(){
+        //we have a 3x3 grid, so 9 positions in total
+        let i = 0;
+        while(i < 9){
+            if(!gameboard[i]) return;
+            i++;
+        }
+        console.log("\nIt's a tie. Nobody wins!");
+        alert("Looks like we have two masterminds here!");
+        return true;
+    }
+
     function updateScore(winner){
         winner.score++;
-        return `Winner is: ${winner.name}`;
+        console.log(`\nWinner is: ${winner.name}`);
+        alert("We have a winner!");
     }
 
     function printBoard(){
         //workaround the default newtrailing behavior of console.log
         //added numbers to each position are the column offset
+        console.log("\n")
         for(let row = rowOffset = 0; row < 3; row++, rowOffset += 2){
             console.log(`${gameboard[row + rowOffset] || " "} | ${gameboard[row + rowOffset + 1] || " "} | ${gameboard[row + rowOffset + 2] || " "}\n`);
         }
+        console.log("\n");
     }
+
+    function printPlayers(){
+        for(const player in players){
+            console.log(`\n${players[player].index} player:\n Name: ${players[player].name}\tMark: ${players[player].mark}\n\tScore: ${players[player].score}`);
+        }
+    }
+
+    function printScore(){
+        console.log(`\nSCORE:\n${players.playerOne.name}: ${players.playerOne.score}\n${players.playerTwo.name}: ${players.playerTwo.score}`)
+    }
+
+    function clearBoard(){
+        gameboard = [];
+    }
+
+    function playRound(){
+        alert("It's time to play! Look at the console to see who's turn is! Let's begin!"); 
+        while(true){
+            for(let player in players){
+                const currentPlayer = players[player];
+                let position = getPosition(currentPlayer);
+                while(gameboard[position]) {
+                    alert("OOPS! It seems a problem occured, have a look at the console for details.")
+                    position = getPosition(currentPlayer, "\nThat position has already been taken. Enter valid position\n");
+                }
+                gameboard[position] = currentPlayer.mark;
+                printBoard();
+                if(checkTie()) {
+                    clearBoard();
+                    return;
+                }
+                if(checkWinner(currentPlayer.mark)){
+                    updateScore(currentPlayer);
+                    clearBoard();
+                    return;
+                }
+            }
+        }
+    };
     
     //private variables
+    let rules = `Tic-tac-toe is a simple game played on a 3x3 grid. It's simple to setup and play which has made it one of the most popular games in the world. Here's how to play:
+
+Objective:
+Be the first player to get three of your marks (either X or O) in a row (horizontally, vertically, or diagonally).
+
+How to Play:
+Players: Two players take turns.
+
+Marking the Grid: Players alternate marking empty spaces in the grid with their assigned mark (X or O).
+
+Winning: The first player to get three of their marks in a row (horizontally, vertically, or diagonally) wins the game.
+
+Tie: If all nine spaces are filled and no player has three in a row, the game ends in a tie.
+`;
+
     let players;
     let gameboard = [];
 
+    //user info
+    alert("Hello!\nWelcome to TicTacToe by crlyflacko!");
+    alert("Open the console to start playing.");
+    console.log(`Hello fratm!\nType "TicTacToe.start()" in the console to start a new game!\n\n(It is case sensitive!)`); 
 
-    function startGame(){
+    function start(){
+        console.log(rules)
+
+        alert("I bet you already know how to play!\nHave a look at the console just in case you want a quick memory refresh!");
+        alert("Time to start!");
         players = getPlayers();
-        const showPlayers = (function(){
-        console.log(`First player\n Name: ${players.playerOne.name} - Marker: ${players.playerOne.marker} - Score: ${players.playerOne.score}\nSecond player\n Name: ${players.playerTwo.name} - Marker: ${players.playerTwo.marker} - Score: ${players.playerTwo.score}\n`);
-        })(players);
+        printPlayers();
+        //first round
+        playRound();
+        
+        while(confirm("Do you want to play another round?")){
+            printScore();
+            playRound();
+        }
 
-        const insertMarker = (function(){
-            while(true){
-                for(let player in players){
-                    let position = getPosition(player);
-                    while(gameboard[position]) {
-                        position = getPosition(player, "Enter valid position\n");
-                    }
-                    gameboard[position] = players[player].marker;
-                    printBoard();
-                    if(checkWinner(players[player].marker)){
-                        console.log(updateScore(players[player]));
-                        return;
-                    }
-                }
-            }
-        })(players, gameboard);
+        if(confirm("Looks like somebody is a poor looser... Do you want to start from scratch?")) start();
+        else {
+            alert("Thank you for playing! Can't wai to see you two play again!")
+            console.log("Bye Bye fratm!");
+        };
     }
 
-    return { startGame }
+    return { start }
 })();
+
+
 
