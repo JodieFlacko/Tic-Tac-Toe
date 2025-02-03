@@ -20,8 +20,22 @@ const gameController = (function(){
         return { playerOne, playerTwo }
     }
 
+    function getPosition(player, message = ""){
+        alert(`${message}${players[player].name}'s Turn:\n`)
+        let keepGoing = true;
+        const pattern = /[1-3]/;
+        let col, row;
+        while(keepGoing){
+            row = +prompt(`Enter the ROW where you want to put the marker: `);
+            col = +prompt(`Enter the COLUMN where you want to put the marker: `);
+            if(pattern.test(row) && pattern.test(col)) keepGoing = false;
+            else alert("Entered values must be numbers between 1 and 3 (included)");
+        }
+        let position = (row - 1) * 3 + col - 1;
+        return position;
+    }
 
-    function checkWinner(){
+    function checkWinner(marker){
         winningLines = {
             firstRow: [0, 1, 2],
             secondRow: [3, 4, 5],
@@ -34,25 +48,16 @@ const gameController = (function(){
         };
         
         for(line in winningLines){
-            let keepGoing = true;
+            //absurd proposition
+            let winnerFound = true;
             winningLines[line].forEach(index => {
-                if(gameboard[index] !== "X") {
-                    keepGoing = false;
+                if(gameboard[index] !== marker) {
+                    winnerFound = false;
                     return;
-                }  
+                }
             });
-            if(keepGoing) {
-                return true;
-            };
+            if(winnerFound) return true;
         }
-    }
-
-    function getPosition(player){
-        alert(`${players[player].name}'s Turn:\n`)
-        const row = prompt(`Enter the ROW where you want to put the marker: `);
-        const col = prompt(`Enter the COLUMN where you want to put the marker: `);
-        let position = (+row - 1) * 3 + +col - 1;
-        return position;
     }
 
     function updateScore(winner){
@@ -63,13 +68,14 @@ const gameController = (function(){
     function printBoard(){
         //workaround the default newtrailing behavior of console.log
         //added numbers to each position are the column offset
-        for(let row = rowOffset = 0; row < 3; row++, rowOffset += 2)
-        console.log(`${gameboard[row + rowOffset] || " "} | ${gameboard[row + rowOffset + 1] || " "} | ${gameboard[row + rowOffset + 2] || " "}\n`);
+        for(let row = rowOffset = 0; row < 3; row++, rowOffset += 2){
+            console.log(`${gameboard[row + rowOffset] || " "} | ${gameboard[row + rowOffset + 1] || " "} | ${gameboard[row + rowOffset + 2] || " "}\n`);
+        }
     }
     
     //private variables
     let players;
-    gameboard = [];
+    let gameboard = [];
 
 
     function startGame(){
@@ -81,10 +87,13 @@ const gameController = (function(){
         const insertMarker = (function(){
             while(true){
                 for(let player in players){
-                    const position = getPosition(player);
+                    let position = getPosition(player);
+                    while(gameboard[position]) {
+                        position = getPosition(player, "Enter valid position\n");
+                    }
                     gameboard[position] = players[player].marker;
                     printBoard();
-                    if(checkWinner()){
+                    if(checkWinner(players[player].marker)){
                         console.log(updateScore(players[player]));
                         return;
                     }
