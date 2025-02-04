@@ -87,9 +87,9 @@ const TicTacToe = (function(){
     function printBoard(){
         //workaround the default newtrailing behavior of console.log
         //added numbers to each position are the column offset
-        console.log("\n")
+        console.log("\n\t\t1   2   3 \n")   
         for(let row = rowOffset = 0; row < 3; row++, rowOffset += 2){
-            console.log(`${gameboard[row + rowOffset] || " "} | ${gameboard[row + rowOffset + 1] || " "} | ${gameboard[row + rowOffset + 2] || " "}\n`);
+            console.log(`\t${row + 1}\t${gameboard[row + rowOffset] || " "} | ${gameboard[row + rowOffset + 1] || " "} | ${gameboard[row + rowOffset + 2] || " "} \n`);
         }
         console.log("\n");
     }
@@ -109,7 +109,8 @@ const TicTacToe = (function(){
     }
 
     function playRound(){
-        alert("It's time to play! Look at the console to see who's turn is! Let's begin!"); 
+        alert("It's time to play! Look at the console to see who's turn is! Let's begin!");
+        printBoard(); 
         while(true){
             for(let player in players){
                 const currentPlayer = players[player];
