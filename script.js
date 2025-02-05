@@ -25,7 +25,21 @@ function Gameboard(){
         board[row][column].updateMark(player);
     }
 
-    return { getBoard, printBoard, addMark };
+    const hasWinner = (row, column, player) => {
+        const winningRow = board[row].filter(column => column.getValue() === player);
+        const winningColumn = board.filter(row => row[column] === player);
+        let winningDiagonal;
+        if((player === board[0][0] && player === board[1][1] && player === board[1][2]) || (player === board[0][2] && player === board[1][1] && player === board[2][0])) winningDiagonal = true;
+
+        if(winningRow.length === 3 || winningColumn.length === 3 || winningDiagonal) return true;
+    };
+
+    const hasTie = () =>{
+        const emptyCells = board.filter(row => row.filter(cell => cell.getValue() === 0).length !== 0);
+        if(!emptyCells.length) return true;
+    };
+
+    return { getBoard, printBoard, addMark, hasWinner, hasTie };
 }
 
 function cell(){
@@ -63,12 +77,21 @@ function GameController(){
         console.log(`${getActivePlayer().name}'s turn.`);
     }
 
-
     const playRound = (row, column) => {
         activePlayer = getActivePlayer();
         console.log(`${activePlayer.name} mark with ${activePlayer.mark} row: ${row}, column: ${column}`);
         board.addMark(row,column, activePlayer.mark);
 
+
+        if(board.hasWinner(row,column, activePlayer.mark)){
+            console.log(`Winner is ${activePlayer}`);
+            return;
+        } 
+        if(board.hasTie()){
+            console.log('Tie');
+            return;
+        }
+        
         switchPlayerTurn();
         printNewRound();
     } 
