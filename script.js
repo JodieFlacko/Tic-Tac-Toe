@@ -83,8 +83,8 @@ function GameController(){
         board.addMark(row,column, activePlayer.mark);
 
 
-        if(board.hasWinner(row,column, activePlayer.mark)){
-            console.log(`Winner is ${activePlayer}`);
+        if(board.hasWinner(row, column, activePlayer.mark)){
+            console.log(`Winner is ${activePlayer.name}`);
             return;
         } 
         if(board.hasTie()){
