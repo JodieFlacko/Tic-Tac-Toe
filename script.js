@@ -26,10 +26,10 @@ function Gameboard(){
     }
 
     const hasWinner = (row, column, player) => {
-        const rowStreak = board[row].filter(column => column.getValue() === player);
-        const columnStreak = board.filter(row => row[column] === player);
+        const rowStreak = board[row].filter(cell => cell.getValue() === player);
+        const columnStreak = board.filter(cell => cell[column].getValue() === player);
         let diagonalStreak;
-        if((player === board[0][0] && player === board[1][1] && player === board[1][2]) || (player === board[0][2] && player === board[1][1] && player === board[2][0])) diagonalStreak = true;
+        if((player === board[0][0].getValue() && player === board[1][1].getValue() && player === board[2][2].getValue()) || (player === board[0][2].getValue() && player === board[1][1].getValue() && player === board[2][0].getValue())) diagonalStreak = true;
 
         if(rowStreak.length === 3 || columnStreak.length === 3 || diagonalStreak) return true;
     };
