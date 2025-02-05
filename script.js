@@ -1,5 +1,5 @@
 const TicTacToe = (function(){
-    gameController = (function(){
+    const gameController = (function(){
                 //private variables
                 const rules =  `Tic-tac-toe is a simple game played on a 3x3 grid. It's simple to setup and play which has made it one of the most popular games in the world. Here's how to play:
     
@@ -118,8 +118,6 @@ const TicTacToe = (function(){
         }
     
         function printScore(players){
-            console.log("framt")
-            console.log(players)
             console.log(`\nSCORE:\n${players.playerOne.name}: ${players.playerOne.score}\n${players.playerTwo.name}: ${players.playerTwo.score}`);
         };
 
@@ -163,10 +161,10 @@ const TicTacToe = (function(){
             alert("Hello!\nWelcome to TicTacToe by crlyflacko!");
             alert("Open the console to start playing.");
             console.log(`Hello fratm!\nType "TicTacToe.start()" in the console to start a new game!\n\n(It is case sensitive!)\n`); 
-            console.log('Type TicTacToe.rules to have a look at the rules.');
+            console.log('Type TicTacToe.rules() to have a look at the rules.');
         })();
 
-        return { getPlayers, printBoard, printPlayers, printScore, playRound, printRules }
+        return { getPlayers, printBoard, printPlayers, printScore, playRound, printRules}
     })();
 
     const start = function (){
@@ -187,7 +185,7 @@ const TicTacToe = (function(){
             console.log("Bye Bye fratm!");
         };
     }
-    return { start, rules: gameController.rules };
+    return { start, rules: gameController.printRules };
 })();
 
 
