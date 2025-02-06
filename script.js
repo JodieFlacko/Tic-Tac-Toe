@@ -106,7 +106,7 @@ function screenController(){
     const game = GameController();
 
     const DOMelements = (function cacheDOM(){
-        boardDiv = document.querySelector(".grid-container");
+        boardDiv = document.querySelector(".game");
         turnDiv = document.querySelector(".turn");
 
         return { boardDiv, turnDiv };
@@ -120,19 +120,20 @@ function screenController(){
         const board = game.getBoard();
         const activePlayer = game.getActivePlayer();
 
-        DOMelements.turnDiv.textContent = `${activePlayer.name}'s turn: `;
 
         //create the cells
         board.forEach((row, index) => {
             const rowIndex = index;
             row.forEach((cell, index) =>{
                 const cellButton = document.createElement("button");
-                cellButton.classList.add(".cell");
+                const cellMark = document.createElement("div");
+                cellButton.classList.add("cell");
                 cellButton.dataset.row = rowIndex;
                 cellButton.dataset.column = index;
-
-                cellButton.textContent = cell.getValue();
+                if(cell.getValue() === "X") cellMark.classList.add("x");
+                else if(cell.getValue() === "O") cellMark.classList.add("o");
                 DOMelements.boardDiv.appendChild(cellButton);
+                cellButton.appendChild(cellMark);
             })
         });
     } 
@@ -141,7 +142,7 @@ function screenController(){
     function clickHandler(event) {
         const selectedRow = event.target.dataset.row;
         const selectedColumn = event.target.dataset.column;
-
+        
         if(!event.target.dataset.row && !event.target.dataset.column) return;
 
         game.playRound(selectedRow, selectedColumn);
