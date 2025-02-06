@@ -113,27 +113,24 @@ function screenController(){
     }());
 
     function updateSreen(){
-        //clear board
-        DOMelements.boardDiv.textContent = "";
-
-        //get newest board
+        //get board
         const board = game.getBoard();
+        const boardRows = boardDiv.querySelectorAll(".row");
         const activePlayer = game.getActivePlayer();
 
 
-        //create the cells
-        board.forEach((row, index) => {
+        //fill the cells
+        boardRows.forEach((row, index) => {
             const rowIndex = index;
-            row.forEach((cell, index) =>{
-                const cellButton = document.createElement("button");
-                const cellMark = document.createElement("div");
-                cellButton.classList.add("cell");
-                cellButton.dataset.row = rowIndex;
-                cellButton.dataset.column = index;
-                if(cell.getValue() === "X") cellMark.classList.add("x");
-                else if(cell.getValue() === "O") cellMark.classList.add("o");
-                DOMelements.boardDiv.appendChild(cellButton);
-                cellButton.appendChild(cellMark);
+            const boardColumns = row.querySelectorAll(".cell");
+            boardColumns.forEach((buttonCell, index) =>{
+                const cellMark = buttonCell.querySelector("div");
+                buttonCell.dataset.row = rowIndex;
+                buttonCell.dataset.column = index;
+                if(!cellMark.classList.contains("x") && !cellMark.classList.contains("o")){
+                    if(board[rowIndex][index].getValue() === "X") cellMark.classList.add("x");
+                    else if(board[rowIndex][index].getValue() === "O") cellMark.classList.add("o");
+                }
             })
         });
     } 

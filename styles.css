@@ -54,6 +54,15 @@
     font-style: normal;
 }
 
+@keyframes appear{
+  0% {
+    transform: scale(0.3);
+  }
+  100%{
+    transform: scale(1);
+  }
+}
+
 /* Page style */
 :root{
   --buff-color: #D4A373;
@@ -97,35 +106,15 @@ h1{
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   grid-template-rows: repeat(3, 1fr);
 }
 
-.x, .o{
+.row{
   width: 100%;
   height: 100%;
-  position: relative;
-}
-
-div.x::before, div.x::after{
-  position: absolute;
-  display: block;
-  width: 20px;
-  height: 160px;
-  top: 20px;
-  left: 80px;
-}
-
-div.o{
-  position: absolute;
-  display: block;
-  width: 140px;
-  height: 140px;
-  border: 20px solid black;
-  border-radius: 50%;
-  top: 30px;
-  left: 30px;
-
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .cell{
@@ -136,6 +125,8 @@ div.o{
   padding: 0;
   width: 100%;
   height: 100%;
+  transition: background-color .1s;
+  will-change: background-color, border-color;
 }
 
 .cell:hover{
@@ -201,4 +192,34 @@ div.o{
   height: 16px;
   top: 3px;
   left: 2px;
+}
+
+.x, .o{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  will-change: transform;
+  animation: appear .2s
+  cubic-bezier(0.5,1.8,0.1,1.1);;
+}
+
+div.x::before, div.x::after{
+  position: absolute;
+  display: block;
+  width: 20px;
+  height: 160px;
+  top: 20px;
+  left: 80px;
+  border-radius: 6px;
+}
+
+div.o{
+  position: absolute;
+  display: block;
+  width: 140px;
+  height: 140px;
+  border: 20px solid black;
+  border-radius: 50%;
+  top: 30px;
+  left: 30px;
 }
