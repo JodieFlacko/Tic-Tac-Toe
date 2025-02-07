@@ -87,6 +87,10 @@ function GameController(){
     }
     
     const getActivePlayer = () => activePlayer;
+    const getPlayersData = () => {
+        return [ {name: players[0].name, mark: players[0].mark, score: players[0].score },{name: players[1].name, mark: players[1].mark, score: players[1].score} ]
+    };  
+
     const printNewRound = () => {
         board.printBoard();
         console.log(`${getActivePlayer().name}'s turn.`);
@@ -118,23 +122,43 @@ function GameController(){
     //initial game message
     printNewRound();
 
-    return { playRound, getActivePlayer, getBoard: board.getBoard, getBoardStatus: board.getStatus, clearBoard: board.clearBoard };
+    return { playRound, getActivePlayer, getBoard: board.getBoard, getBoardStatus: board.getStatus, clearBoard: board.clearBoard, getPlayersData };
 }
 
 function screenController(){
     const game = GameController();
     const DOMelements = (function cacheDOM(){
         const boardDiv = document.querySelector(".game");
-        const turnDiv = document.querySelector(".turn");
+        const dataDiv = document.querySelector(".data");
         const boardRows = boardDiv.querySelectorAll(".row");
         const cells = boardDiv.querySelectorAll(".row div");
-        return { boardDiv, turnDiv, boardRows, cells };
+        return { boardDiv, boardRows, cells, dataDiv };
     }());
 
     function updateSreen(){        
-        //get board
+        //get board and players data
         const board = game.getBoard();
-        
+        const players = game.getPlayersData();
+        DOMelements.dataDiv.textContent = "";
+        //displaying data
+        players.forEach(player => {
+            const playerPar = document.createElement("p");
+            playerPar.classList.add("player");
+            const nameSpan = document.createElement("span");
+            const markSpan = document.createElement("span");
+            const scoreSpan = document.createElement("span");
+            scoreSpan.classList.add("score");
+            markSpan.classList.add("mark");
+
+            DOMelements.dataDiv.appendChild(playerPar);
+            playerPar.appendChild(nameSpan);
+            playerPar.appendChild(markSpan);
+            playerPar.appendChild(scoreSpan);
+
+            nameSpan.textContent = player.name.toUpperCase() + ":";
+            markSpan.classList.add(player.mark.toLowerCase());
+            scoreSpan.textContent = player.score;
+        });
 
         //fill the cells
         DOMelements.boardRows.forEach((row, index) => {

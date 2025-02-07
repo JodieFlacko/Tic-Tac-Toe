@@ -17,7 +17,7 @@
     max-width: 100%;
   }
   
-  input, button, textarea, select {
+  input, button, textarea, select, p, span {
     font: inherit;
   }
   
@@ -86,7 +86,7 @@ body{
   top: 50%;
   left: 50%;
   width: 600px;
-  height: 600px;
+  height: 720px;
   margin-left: -300px;
   margin-top: -350px;
 }
@@ -103,8 +103,8 @@ h1{
 }
 
 .game{
-  width: 100%;
-  height: 100%;
+  width: 600px;
+  height: 600px;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(3, 1fr);
@@ -133,30 +133,45 @@ h1{
   background-color: var(--cornsilk-color);
 }
 
-.scores{
-  position: absolute;
-  top: 50%;
-  left: 50%;
+.data{
   width: 600px;
   height: 120px;
-  margin-left: -300px;
-  margin-top: 270px;
-  background-color: #D4A373;
+  background-color: var(--buff-color);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 2fr;
+  justify-items: center;
+  font-weight: 600;
+  padding: 8px 12px 12px; 
 }
 
-.scores .x{
+.data .player{
+  padding-top: 12px;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: 1fr 2fr;
+  justify-items: center;
+}
+
+.data .score{
+  font-size: 250%;
+  grid-column: 1/ -1;
+}
+
+.data .x{
   display: inline-block;
   width: 17px;
   height: 17px;
   transform: translate3d(0, 0, 0);
 }
 
-.scores .x::before, .scores .x::after{
+.data .x::before, .data .x::after{
   top: 3px;
   left: 2px;
   margin-left: 7px;
-  width: 2px;
+  width: 3px;
   height: 17px;
+  border-radius: 1px;
 }
 
 .x::before, .x::after{
@@ -174,33 +189,29 @@ h1{
   transform: rotate(45deg);
 }
 
-.scores .o{
+.data .o{
   display: inline-block;
-  width: 17px;
-  height: 17px;
-  transform: translate3d(0, 0, 0);
-}
-
-.scores .o::before{
-  content: "";
-  display: block;
-  position: absolute;
-  border: 2px solid black;
+  border: 3px solid black;
   background-color: transparent;
   border-radius: 50%;
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   top: 3px;
   left: 2px;
+  transform: translate3d(0, 0, 0);
 }
 
 .x, .o{
   width: 100%;
   height: 100%;
   position: relative;
+}
+
+.game .x, .game .o {
   will-change: transform;
   animation: appear .2s
   cubic-bezier(0.5,1.8,0.1,1.1);;
+
 }
 
 div.x::before, div.x::after{
