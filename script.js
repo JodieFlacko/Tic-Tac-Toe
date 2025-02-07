@@ -127,6 +127,7 @@ function GameController(){
 
 function screenController(){
     const game = GameController();
+    //cache DOM elements
     const DOMelements = (function cacheDOM(){
         const boardDiv = document.querySelector(".game");
         const dataDiv = document.querySelector(".data");
@@ -187,7 +188,7 @@ function screenController(){
             return;
         }
 
-        //else a mark is inserted
+        //else insert marker
         const selectedRow = event.target.dataset.row;
         const selectedColumn = event.target.dataset.column;
         
@@ -200,6 +201,10 @@ function screenController(){
     DOMelements.boardDiv.addEventListener("click", clickHandler);
     
     updateSreen();
+}
+
+function getUserInput(){
+    
 }
 
 screenController();
