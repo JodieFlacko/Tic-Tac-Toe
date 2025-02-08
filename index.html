@@ -10,20 +10,36 @@
 <body>
     <div class="header">
     </div>
-    <dialog open>
-        <form action="#" method="get">
-            <div class="name">
-                <label for="name1"><h3>ENTER YOUR NAME</h3></label>
-                <input type="text" name="name1" id="name1">
-            </div>
-            <div class="mark-choice">
-                <h3>CHOOSE YOUR MARK</h3>
-                <input type="radio" id="mark-x" name="mark" class="mark-button x" value="x">
-                <input type="radio" id="mark-x" name="mark" class="mark-button o" value="o">
-            </div>
-        </form>
-    </dialog>
-    <div class="container">
+    <div class="dialogs-container">
+        <dialog class="first-dialog" open>
+            <form class="first-form" action="#" method="get">
+                <div class="name">
+                    <label for="name1"><h3>ENTER FIRST PLAYER NAME</h3></label>
+                    <input type="text" name="name" id="name1">
+                </div>
+                <div class="mark-choice">
+                    <h3>CHOOSE MARK</h3>
+                    <input type="radio" id="mark-x" name="mark" class="mark-button x" value="X">
+                    <input type="radio" id="mark-x" name="mark" class="mark-button o" value="O">
+                </div>
+                <div class="confirm">
+                    <button type="submit" data-first="1">CONFIRM</button>
+                </div>
+            </form>
+        </dialog>
+        <dialog class="second-dialog">
+            <form class="second-form" action="#" method="get">
+                <div class="name">
+                    <label for="name2"><h3>ENTER SECOND PLAYER NAME</h3></label>
+                    <input type="text" name="name" id="name2">
+                </div>
+                <div class="confirm">
+                    <button type="submit" data-last="1">CONFIRM</button>
+                </div>
+            </form>
+        </dialog>
+    </div>
+    <div class="container" hidden>
         <div class="game">
             <div class="row">
                 <button class="cell">

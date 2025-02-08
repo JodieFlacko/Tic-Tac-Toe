@@ -65,31 +65,43 @@ function cell(){
     return { getValue, updateMark };
 }
 
-function GameController(){
+function Player(){
     let players = [
         {
-            name: "playerOne",
-            mark: "X",
+            name: "",
             score: 0,
+            mark: "",
         },
         {
-            name: "playerTwo",
-            mark: "O",
+            name: "",
             score: 0,
-        },
+            mark: "",
+        }
     ];
 
+    const getPlayers = () =>  players;
+    const setData = (name, mark = players[0].mark) => {
+       if(players[0].name === "")
+        players[0].name = name;
+        else players[1].name = name;
+        if(players[0].mark === "") players[0].mark = mark;
+        else players[1].mark = mark === "X" ? "O" : "X";
+    }
+
+    return { getPlayers, setData };
+}
+
+function GameController(){
+    const playersController = Player();
     const board = Gameboard();
+    const players = playersController.getPlayers();
     let activePlayer = players[0]; 
 
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
     }
     
-    const getActivePlayer = () => activePlayer;
-    const getPlayersData = () => {
-        return [ {name: players[0].name, mark: players[0].mark, score: players[0].score },{name: players[1].name, mark: players[1].mark, score: players[1].score} ]
-    };  
+    const getActivePlayer = () => activePlayer; 
 
     const printNewRound = () => {
         board.printBoard();
@@ -99,8 +111,6 @@ function GameController(){
     const updateScore = () => {
         activePlayer.score++;
     }
-
-
 
     const playRound = (row, column) => {
 
@@ -122,21 +132,31 @@ function GameController(){
     //initial game message
     printNewRound();
 
-    return { playRound, getActivePlayer, getBoard: board.getBoard, getBoardStatus: board.getStatus, clearBoard: board.clearBoard, getPlayersData };
+    return { playRound, getActivePlayer, getBoard: board.getBoard, getBoardStatus: board.getStatus, clearBoard: board.clearBoard, getPlayersData: playersController.getPlayers, setPlayerData: playersController.setData };
 }
 
 function screenController(){
     const game = GameController();
     //cache DOM elements
     const DOMelements = (function cacheDOM(){
-        const boardDiv = document.querySelector(".game");
-        const dataDiv = document.querySelector(".data");
+        const container = document.querySelector(".container");
+        const dialogsContainer = document.querySelector(".dialogs-container");
+        const boardDiv = container.querySelector(".game");
+        const dataDiv = container.querySelector(".data");
         const boardRows = boardDiv.querySelectorAll(".row");
         const cells = boardDiv.querySelectorAll(".row div");
-        return { boardDiv, boardRows, cells, dataDiv };
+        const dialog = dialogsContainer.querySelector(".first-dialog");
+        const secondDialog = dialogsContainer.querySelector(".second-dialog");
+        const form = dialog.querySelector(".first-form");
+        const secondForm = secondDialog.querySelector(".second-form");
+        const confirmButtons = dialogsContainer.querySelectorAll(".confirm button");
+        return { container, boardDiv, boardRows, cells, dataDiv, form, secondForm, confirmButtons, dialog, secondDialog, dialogsContainer };
     }());
 
-    function updateSreen(){        
+    function updateSreen(){  
+        //show game
+        DOMelements.container.removeAttribute("hidden");
+
         //get board and players data
         const board = game.getBoard();
         const players = game.getPlayersData();
@@ -178,7 +198,7 @@ function screenController(){
     } 
 
     //event handler
-    function clickHandler(event) {
+    function boardClickHandler(event) {
         //get board status
         const boardStatus = game.getBoardStatus();
         //if someone wins or there is a tie the board is cleared
@@ -198,13 +218,31 @@ function screenController(){
         updateSreen();  
     }
 
-    DOMelements.boardDiv.addEventListener("click", clickHandler);
-    
-    updateSreen();
-}
+    function getDialogData(dialog){
+        const form = dialog.querySelector("form");
+        const name = form.name.value;
+        let mark;
+        if(form.mark) mark = form.mark.value;
+        return{name, mark}
+    }
 
-function getUserInput(){
-    
+    function formClickHandler(event) {
+        event.preventDefault();
+        const dialog = event.target.parentElement.parentElement.parentElement;
+        const {name, mark} = getDialogData(dialog);
+        game.setPlayerData(name, mark);
+        dialog.close();
+        if(event.target.dataset.last) {
+            DOMelements.container.removeAttribute("hidden");
+            updateSreen();
+            return;
+        }
+        const nextDialog = dialog.parentElement.querySelector(`dialog:nth-child(2)`);
+        nextDialog.show();
+    }
+
+    DOMelements.boardDiv.addEventListener("click", boardClickHandler);
+    DOMelements.confirmButtons.forEach(button => button.addEventListener("click", formClickHandler))
 }
 
 screenController();
