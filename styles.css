@@ -64,26 +64,31 @@
   }
 }
 
-@keyframes disappear{
-  100%{
-    transform: scale(0.3);
-  }
-  0% {
+@keyframes intro-text{
+  0%{
     transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  100%{
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
 /* Page style */
 :root{
-  --warm-red: rgb(84, 11, 14, .9);
-  --vivid-red: rgb(117, 0, 8, .9);
-  --papaya: #FDF0D5;
-  --blue: rgb(0, 48, 73);
-  --light-blue: rgb(102, 155, 188, .7);
-  --bg-color: #212529;
+  --pink: #FFCAD4;
+  --warm-pink: #9D8189;
+  --vivid-pink: #F4ACB7;
+  --bg-color: #9D8189;
   --light-black: #343A40;
   --light-black-border: rgb(52, 58, 64, .3);  
-  --platinum: #E5E5E5;
+  --platinum: #FFE5D9;
+  --black: #161014;
 }
 
 
@@ -134,7 +139,7 @@ h1{
 .cell{
   position: relative;
   border-collapse: collapse;
-  border: 1px solid black;
+  border: 3px solid var(--black);
   margin: 0;
   padding: 0;
   width: 100%;
@@ -145,7 +150,8 @@ h1{
 }
 
 .cell:hover{
-  background-color: var(--light-black);
+  background-color: var(--pink);
+  border-radius: 3px;
 }
 
 .data{
@@ -193,7 +199,7 @@ h1{
   content: "";
   display: block;
   position: absolute;
-  background-color: black;
+  background-color: var(--black);
 }
 
 .x::before{
@@ -206,7 +212,7 @@ h1{
 
 .data .o{
   display: inline-block;
-  border: 3px solid black;
+  border: 3px solid var(--black);
   background-color: transparent;
   border-radius: 50%;
   width: 15px;
@@ -243,7 +249,7 @@ div.o{
   display: block;
   width: 140px;
   height: 140px;
-  border: 20px solid black;
+  border: 20px solid var(--black);
   border-radius: 50%;
   top: 30px;
   left: 30px;
@@ -299,11 +305,11 @@ div.o{
 }
 
 .name input:hover{
-  border-color: var(--warm-red);
+  border-color: var(--warm-pink);
 }
 
 .name input:focus{
-  border-color: var(--vivid-red);
+  border-color: var(--vivid-pink);
 }
 
 .mark-choice{
@@ -326,7 +332,7 @@ div.o{
   height: 90px;
   appearance: none;
   border: none;
-  border: 3px solid var(--light-black);
+  border: 3px solid var(--light-black-border);
   transition: .2s all linear;
 }
 
@@ -343,20 +349,20 @@ div.o{
   content: "";
   width: 45px;
   height: 45px;
-  border: 8px solid black;
+  border: 8px solid var(--black);
   border-radius: 50%;
   top: 19px;
   left: 35px;
 }
 
 .mark-button.x:hover, .mark-button.x:hover, .mark-button.o:hover, .confirm button:hover {
-  background-color: var(--warm-red);
-  border-color: var(--warm-red);
+  background-color: var(--warm-pink);
+  border-color: var(--warm-pink);
 }
 
 .mark-button.x:checked, .mark-button.x:checked, .mark-button.o:checked, .confirm button:focus {
-  background-color: var(--vivid-red);
-  border-color: var(--vivid-red);
+  background-color: var(--vivid-pink);
+  border-color: var(--vivid-pink);
 }
 
 .confirm {
@@ -370,9 +376,10 @@ div.o{
   height: 50px;
   appearance: none;
   border: none;
-  border: 3px solid var(--light-black);
+  border: 3px solid var(--light-black-border);
   transition: .2s all linear;
   font-weight: 600;
+  background-color: inherit;
 }
 
 .second-dialog{
@@ -417,6 +424,45 @@ div.o{
 
 .first-dialog[open], .second-dialog[open]{
   animation: appear .1s;
+}
+
+.cell.top {
+  border-top-color: transparent;
+}
+
+.cell.left{
+  border-left-color: transparent;
+}
+
+.cell.right{
+  border-right-color: transparent;
+}
+
+.cell.bottom{
+  border-bottom-color: transparent;
+}
+
+.intro{
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 180px;
+  gap: 50px;
+  font-size: 150%;
+  background: linear-gradient(270deg, rgba(244,172,183,1) 0%, rgba(157,129,137,1) 35%, rgba(22,16,20,1) 100%);
+}
+
+.intro h1{
+  word-spacing: 10px;
+}
+
+.intro h5{
+  margin-top: -35px;
+}
+
+.intro p{
+  animation: intro-text 1.5s ease-out infinite;
 }
 
 
