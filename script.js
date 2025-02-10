@@ -1,59 +1,46 @@
 //Gameboard represents the state of the board. Each square holds a cell, defined later
 function Gameboard(){
     let board = [];
-    const rows = 3;
-    const columns = 3;
+    const cells = 9;
+    const winningCombos = [ 
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+        [0,4,8],
+        [2,4,6]
+    ];
     let status;
+
     //This loop creates a bidimensionale array of cells (later defined by Cell())
-    for(let i = 0; i < rows; i++){
-        board[i] = [];
-        for(let j = 0; j < columns; j++){
-            board[i].push(cell());
-        }
+    for(let i = 0; i < cells; i++){
+        board.push(cell())
     }
 
     //For later UI use
     const getBoard = () => board;
-    const getStatus = () => status;
     const printBoard = () => {
-        const boardWithCellMarks = board.map((row) => row.map(cell => cell.getValue()));
+        const boardWithCellMarks = board.map(cell => cell.getValue());
         console.log(boardWithCellMarks);
     }
 
-    const addMark = (row, column, player) => {
+    const addMark = (index, player) => {
         //if the value is a truthy value (i.e. a mark) the move is invalid
-        if(board[row][column].getValue()) return;
+        if(board[index].getValue()) return;
 
-        board[row][column].updateMark(player);
+        board[index].updateMark(player);
     }
 
-    const updateStatus = (row, column, player) => {
-        const rowStreak = board[row].filter(cell => cell.getValue() === player);
-        const columnStreak = board.filter(cell => cell[column].getValue() === player);
-        const emptyCells = board.filter(row => row.filter(cell => cell.getValue() === "").length !== 0);
-        let diagonalStreak;
-        if((player === board[0][0].getValue() && player === board[1][1].getValue() && player === board[2][2].getValue()) || (player === board[0][2].getValue() && player === board[1][1].getValue() && player === board[2][0].getValue())) diagonalStreak = true;
-
-        if(rowStreak.length === 3 || columnStreak.length === 3 || diagonalStreak) {
-            status = "win";
-        }
-
-        else if(!emptyCells.length) {
-            status = "tie";
-        }
-    };
-
     const clearBoard = () =>{
-        for(let i = 0; i < rows; i++){
-            board[i] = [];
-            for(let j = 0; j < columns; j++){
-                board[i].push(cell());
-            }
-        }
+        board = [];
         status = ''; 
     }
 
-    return { getBoard, printBoard, addMark, getStatus, clearBoard, updateStatus};
+    const getWinningCombos = () => winningCombos;
+
+    return { getBoard, printBoard, addMark, clearBoard, getWinningCombos };
 }
 
 function cell(){
@@ -61,7 +48,6 @@ function cell(){
 
     const getValue = () => value;
     const updateMark = (player) => value = player;
-
     return { getValue, updateMark };
 }
 
@@ -96,6 +82,7 @@ function GameController(){
     const board = Gameboard();
     const players = playersController.getPlayers();
     let activePlayer = players[0]; 
+    let gameWon = false;
 
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
@@ -108,49 +95,65 @@ function GameController(){
         console.log(`${getActivePlayer().name}'s turn.`);
     }
 
+    const checkWin = (index, player) => {
+        const winningCombos = board.getWinningCombos();
+        let plays = board.getBoard().reduce((total, elem, index) => elem.getValue() === player ? total.concat(index) : total, []);
+        console.log(winningCombos)
+        for([index, winCombo] of winningCombos.entries()){
+            if(winCombo.every(elem => plays.indexOf(elem) > -1)){
+                gameWon = { player: player, index: index };
+                break;
+            }
+        }
+        return gameWon;
+    }
+
+    const getGameStatus = () => gameWon;
+
     const updateScore = () => {
         activePlayer.score++;
     }
 
-    const playRound = (row, column) => {
+    const playRound = (index) => {
 
+        let gameWon = false;
         activePlayer = getActivePlayer();
 
-        console.log(`${activePlayer.name} mark with ${activePlayer.mark} row: ${row}, column: ${column}`);
-        board.addMark(row,column, activePlayer.mark);
-        board.updateStatus(row, column, activePlayer.mark)
-        boardStatus = board.getStatus();
-        if(boardStatus === "win") {
-            updateScore();
-            return;
-        }
+        console.log(`${activePlayer.name} mark with ${activePlayer.mark} row: ${index}`);
+        board.addMark(index, activePlayer.mark);
 
+        checkWin(index, activePlayer.mark);
+        if(gameWon){
+            updateScore();
+            console.log("fratms")
+        }
         switchPlayerTurn();
         printNewRound();
+        
     } 
 
     //initial game message
     printNewRound();
 
-    return { playRound, getActivePlayer, getBoard: board.getBoard, getBoardStatus: board.getStatus, clearBoard: board.clearBoard, getPlayersData: playersController.getPlayers, setPlayerData: playersController.setData };
+    return { playRound, getActivePlayer, getBoard: board.getBoard, getGameStatus, clearBoard: board.clearBoard, getPlayersData: playersController.getPlayers, setPlayerData: playersController.setData };
 }
 
 function screenController(){
     const game = GameController();
     //cache DOM elements
     const DOMelements = (function cacheDOM(){
-        const container = document.querySelector(".container");
+        const body = document.querySelector("body");
+        const container = body.querySelector(".container");
         const dialogsContainer = document.querySelector(".dialogs-container");
         const boardDiv = container.querySelector(".game");
         const dataDiv = container.querySelector(".data");
-        const boardRows = boardDiv.querySelectorAll(".row");
-        const cells = boardDiv.querySelectorAll(".row div");
+        const cells = boardDiv.querySelectorAll(".game div");
+        const buttonCells = boardDiv.querySelectorAll("button");
         const dialog = dialogsContainer.querySelector(".first-dialog");
-        const secondDialog = dialogsContainer.querySelector(".second-dialog");
         const form = dialog.querySelector(".first-form");
-        const secondForm = secondDialog.querySelector(".second-form");
         const confirmButtons = dialogsContainer.querySelectorAll(".confirm button");
-        return { container, boardDiv, boardRows, cells, dataDiv, form, secondForm, confirmButtons, dialog, secondDialog, dialogsContainer };
+        const intro = document.querySelector(".intro")
+        return { container, boardDiv, cells, dataDiv, form, confirmButtons, dialog, dialogsContainer, body, intro, buttonCells };
     }());
 
     function updateSreen(){  
@@ -182,39 +185,33 @@ function screenController(){
         });
 
         //fill the cells
-        DOMelements.boardRows.forEach((row, index) => {
-            const rowIndex = index;
-            const boardColumns = row.querySelectorAll(".cell");
-            boardColumns.forEach((buttonCell, index) =>{
-                const cellMark = buttonCell.querySelector("div");
-                buttonCell.dataset.row = rowIndex;
-                buttonCell.dataset.column = index;
-                if(!cellMark.hasAttribute("class")){
-                    if(board[rowIndex][index].getValue() === "X") cellMark.classList.add("x");
-                    else if(board[rowIndex][index].getValue() === "O") cellMark.classList.add("o");
+        DOMelements.buttonCells.forEach((button, index) => {
+                button.dataset.index = index;
+                const cell = button.querySelector("div");
+                if(!cell.hasAttribute("class")){
+                    if(board[index].getValue() === "X") cell.classList.add("x");
+                    else if(board[index].getValue() === "O") cell.classList.add("o");
                 }
-            })
-        });
+            });
     } 
 
     //event handler
     function boardClickHandler(event) {
         //get board status
-        const boardStatus = game.getBoardStatus();
+        const status = game.getGameStatus()
         //if someone wins or there is a tie the board is cleared
-        if(boardStatus === "win" || boardStatus === "tie"){
+        if(status){
             DOMelements.cells.forEach(cell => cell.removeAttribute("class"));
             game.clearBoard();
             return;
         }
 
         //else insert marker
-        const selectedRow = event.target.dataset.row;
-        const selectedColumn = event.target.dataset.column;
+        const selectedCell = event.target.dataset.index;
         
-        if(!event.target.dataset.row && !event.target.dataset.column) return;
+        if(!event.target.dataset.index) return;
 
-        game.playRound(selectedRow, selectedColumn);
+        game.playRound(selectedCell);
         updateSreen();  
     }
 
@@ -241,8 +238,17 @@ function screenController(){
         nextDialog.show();
     }
 
+    function bodyHandler(e){
+        e.preventDefault();
+        DOMelements.intro.style.display = "none";
+        DOMelements.dialog.show();
+        ["keypress", "click"].forEach(event => DOMelements.body.removeEventListener(event, bodyHandler))
+    }
+
     DOMelements.boardDiv.addEventListener("click", boardClickHandler);
-    DOMelements.confirmButtons.forEach(button => button.addEventListener("click", formClickHandler))
+    DOMelements.confirmButtons.forEach(button => button.addEventListener("click", formClickHandler));
+    ["keypress", "click"].forEach(event => DOMelements.body.addEventListener(event, bodyHandler))
+
 }
 
 screenController();
