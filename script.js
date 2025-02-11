@@ -101,8 +101,9 @@ function GameController(){
     };
 
     const checkTie = () => {
-        const emptyCells = board.filter(cell => cell.getValue() === "");
-        if(emptyCells) status = "tie";
+        const emptyCells = board.getBoard().filter(cell => cell.getValue() === "");
+        console.log(emptyCells)
+        if(emptyCells.length === 0) status.value = "tie";
     }
 
     const roundOver = () =>{
@@ -121,12 +122,12 @@ function GameController(){
     const playRound = (index) => {
         activePlayer = getActivePlayer();
 
-        console.log(`${activePlayer.name} mark with ${activePlayer.mark} row: ${index}`);
         board.addMark(index, activePlayer.mark);
 
         checkWin(index, activePlayer.mark);
+        checkTie();
         if(status.value){
-            updateScore();
+            if(status.value=== "win") updateScore();
             switchPlayerTurn();
             return status;
         }
@@ -189,10 +190,7 @@ function screenController(){
 
             //display turn
             const activePlayer = game.getActivePlayer().mark;
-            if(player.mark === activePlayer) {
-                activePlayerSpan.textContent = "MY TURN"
-            }
-
+            if(player.mark === activePlayer) activePlayerSpan.textContent = "MY TURN";
         });
 
 
@@ -214,6 +212,10 @@ function screenController(){
         winningCombos[index].forEach(element => DOMelements.cells[element].classList.add("update-status"));
     }
 
+    const showTie = () => {
+        DOMelements.cells.forEach(cell => cell.classList.add("update-status"));
+    }
+
     //event handler
     function boardClickHandler(event) {
         
@@ -233,7 +235,9 @@ function screenController(){
         if(!event.target.dataset.index) return;
 
         status = game.playRound(selectedCell);
-        if(status.value) showWin(status.index);
+        console.log(status)
+        if(status.value === "win") showWin(status.index);
+        if(status.value === "tie") showTie();
         updateSreen();  
     }
 
