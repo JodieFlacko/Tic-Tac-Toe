@@ -40,16 +40,16 @@
 
 @font-face {
     font-family: 'airbnbcereal_w_bkregular';
-    src: url('fonts/airbnbcereal_w_bk-webfont.woff2') format('woff2'),
-         url('fonts/airbnbcereal_w_bk-webfont.woff') format('woff');
+    src: url('../fonts/airbnbcereal_w_bk-webfont.woff2') format('woff2'),
+         url('../fonts/airbnbcereal_w_bk-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'airbnbcereal_w_bluploadedfile';
-    src: url('fonts/airbnbcereal_w_blk-webfont.woff2') format('woff2'),
-         url('fonts/airbnbcereal_w_blk-webfont.woff') format('woff');
+    src: url('../fonts/airbnbcereal_w_blk-webfont.woff2') format('woff2'),
+         url('../fonts/airbnbcereal_w_blk-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
