@@ -18,26 +18,26 @@
             <form class="first-form" action="#" method="get">
                 <div class="name">
                     <label for="name1"><h3>ENTER FIRST PLAYER NAME</h3></label>
-                    <input type="text" name="name" id="name1">
+                    <input type="text" name="name" id="name1" required maxlength="12">
                 </div>
                 <div class="mark-choice">
                     <h3>CHOOSE MARK</h3>
-                    <input type="radio" id="mark-x" name="mark" class="mark-button x" value="X">
+                    <input type="radio" id="mark-x" name="mark" class="mark-button x" value="X" required>
                     <input type="radio" id="mark-x" name="mark" class="mark-button o" value="O">
                 </div>
                 <div class="confirm">
-                    <button type="submit" data-first="1">CONFIRM</button>
+                    <button type="submit">CONFIRM</button>
                 </div>
             </form>
         </dialog>
         <dialog class="second-dialog">
-            <form class="second-form" action="#" method="get">
+            <form class="second-form" action="#" method="get"  data-last="1">
                 <div class="name">
                     <label for="name2"><h3>ENTER SECOND PLAYER NAME</h3></label>
-                    <input type="text" name="name" id="name2">
+                    <input type="text" name="name" id="name2" required maxlength="12">
                 </div>
                 <div class="confirm">
-                    <button type="submit" data-last="1">CONFIRM</button>
+                    <button type="submit">CONFIRM</button>
                 </div>
             </form>
         </dialog>

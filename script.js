@@ -1,7 +1,7 @@
 //Gameboard represents the state of the board. Each square holds a cell, defined later
 function Gameboard(){
-    let board = [];
     const cells = 9;
+    let board;
     const winningCombos = [ 
         [0,1,2],
         [3,4,5],
@@ -12,19 +12,9 @@ function Gameboard(){
         [0,4,8],
         [2,4,6]
     ];
-    let status;
-
-    //This loop creates a bidimensionale array of cells (later defined by Cell())
-    for(let i = 0; i < cells; i++){
-        board.push(cell())
-    }
 
     //For later UI use
     const getBoard = () => board;
-    const printBoard = () => {
-        const boardWithCellMarks = board.map(cell => cell.getValue());
-        console.log(boardWithCellMarks);
-    }
 
     const addMark = (index, player) => {
         //if the value is a truthy value (i.e. a mark) the move is invalid
@@ -33,14 +23,19 @@ function Gameboard(){
         board[index].updateMark(player);
     }
 
-    const clearBoard = () =>{
+    const clearBoard = () => {
         board = [];
-        status = ''; 
-    }
+        for(let i = 0; i < cells; i++){
+        board.push(cell())
+        }
+    };
 
     const getWinningCombos = () => winningCombos;
 
-    return { getBoard, printBoard, addMark, clearBoard, getWinningCombos };
+    //This loop creates a bidimensionale array of cells (later defined by Cell())
+    clearBoard();
+
+    return { getBoard, addMark , getWinningCombos, clearBoard };
 }
 
 function cell(){
@@ -82,7 +77,9 @@ function GameController(){
     const board = Gameboard();
     const players = playersController.getPlayers();
     let activePlayer = players[0]; 
-    let gameWon = false;
+    let status = {
+            value: false,
+        };
 
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
@@ -90,52 +87,53 @@ function GameController(){
     
     const getActivePlayer = () => activePlayer; 
 
-    const printNewRound = () => {
-        board.printBoard();
-        console.log(`${getActivePlayer().name}'s turn.`);
-    }
-
     const checkWin = (index, player) => {
         const winningCombos = board.getWinningCombos();
         let plays = board.getBoard().reduce((total, elem, index) => elem.getValue() === player ? total.concat(index) : total, []);
-        console.log(winningCombos)
         for([index, winCombo] of winningCombos.entries()){
             if(winCombo.every(elem => plays.indexOf(elem) > -1)){
-                gameWon = { player: player, index: index };
+                status = { value: "win", index: index };
                 break;
             }
         }
-        return gameWon;
+        return status;
+    };
+
+    const checkTie = () => {
+        const emptyCells = board.filter(cell => cell.getValue() === "");
+        if(emptyCells) status = "tie";
     }
 
-    const getGameStatus = () => gameWon;
+    const roundOver = () =>{
+        board.clearBoard(); 
+        status = {
+            value: false,
+        };
+    };
+
+    const getGameStatus = () => status;
 
     const updateScore = () => {
         activePlayer.score++;
-    }
+    };
 
     const playRound = (index) => {
-
-        let gameWon = false;
         activePlayer = getActivePlayer();
 
         console.log(`${activePlayer.name} mark with ${activePlayer.mark} row: ${index}`);
         board.addMark(index, activePlayer.mark);
 
         checkWin(index, activePlayer.mark);
-        if(gameWon){
+        if(status.value){
             updateScore();
-            console.log("fratms")
+            switchPlayerTurn();
+            return status;
         }
         switchPlayerTurn();
-        printNewRound();
-        
+        return status;
     } 
 
-    //initial game message
-    printNewRound();
-
-    return { playRound, getActivePlayer, getBoard: board.getBoard, getGameStatus, clearBoard: board.clearBoard, getPlayersData: playersController.getPlayers, setPlayerData: playersController.setData };
+    return { playRound, getActivePlayer, getBoard: board.getBoard, getWinningCombos: board.getWinningCombos, getGameStatus, roundOver: board.roundOver, getPlayersData: playersController.getPlayers, setPlayerData: playersController.setData, roundOver, checkTie };
 }
 
 function screenController(){
@@ -151,12 +149,14 @@ function screenController(){
         const buttonCells = boardDiv.querySelectorAll("button");
         const dialog = dialogsContainer.querySelector(".first-dialog");
         const form = dialog.querySelector(".first-form");
+        const secondForm = dialogsContainer.querySelector(".second-form")
         const confirmButtons = dialogsContainer.querySelectorAll(".confirm button");
         const intro = document.querySelector(".intro")
-        return { container, boardDiv, cells, dataDiv, form, confirmButtons, dialog, dialogsContainer, body, intro, buttonCells };
+        return { container, boardDiv, cells, dataDiv, form, confirmButtons, dialog, dialogsContainer, body, intro, buttonCells, secondForm };
     }());
 
     function updateSreen(){  
+
         //show game
         DOMelements.container.removeAttribute("hidden");
 
@@ -188,30 +188,37 @@ function screenController(){
         DOMelements.buttonCells.forEach((button, index) => {
                 button.dataset.index = index;
                 const cell = button.querySelector("div");
-                if(!cell.hasAttribute("class")){
+                if(!cell.classList.contains("x") || !cell.classList.contains("o")){
                     if(board[index].getValue() === "X") cell.classList.add("x");
                     else if(board[index].getValue() === "O") cell.classList.add("o");
                 }
             });
     } 
+    const showWin = (index) =>{
+        const winningCombos = game.getWinningCombos();
+        winningCombos[index].forEach(element => DOMelements.cells[element].classList.add("update-status"));
+    }
 
     //event handler
     function boardClickHandler(event) {
+        
         //get board status
-        const status = game.getGameStatus()
+        let status = game.getGameStatus();
         //if someone wins or there is a tie the board is cleared
-        if(status){
+        if(status.value){
             DOMelements.cells.forEach(cell => cell.removeAttribute("class"));
-            game.clearBoard();
+            game.roundOver();
             return;
         }
 
         //else insert marker
         const selectedCell = event.target.dataset.index;
         
+        //make sure we click on the cell and not in the spaces between
         if(!event.target.dataset.index) return;
 
-        game.playRound(selectedCell);
+        status = game.playRound(selectedCell);
+        if(status.value) showWin(status.index);
         updateSreen();  
     }
 
@@ -225,7 +232,7 @@ function screenController(){
 
     function formClickHandler(event) {
         event.preventDefault();
-        const dialog = event.target.parentElement.parentElement.parentElement;
+        const dialog = event.target.parentElement;
         const {name, mark} = getDialogData(dialog);
         game.setPlayerData(name, mark);
         dialog.close();
@@ -246,8 +253,9 @@ function screenController(){
     }
 
     DOMelements.boardDiv.addEventListener("click", boardClickHandler);
-    DOMelements.confirmButtons.forEach(button => button.addEventListener("click", formClickHandler));
-    ["keypress", "click"].forEach(event => DOMelements.body.addEventListener(event, bodyHandler))
+    DOMelements.form.addEventListener("submit", formClickHandler);
+    DOMelements.secondForm.addEventListener("submit", formClickHandler);
+    ["keypress", "click"].forEach(event => DOMelements.body.addEventListener(event, bodyHandler));
 
 }
 
