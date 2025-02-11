@@ -83,6 +83,7 @@ function GameController(){
 
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
+        
     }
     
     const getActivePlayer = () => activePlayer; 
@@ -171,18 +172,32 @@ function screenController(){
             const nameSpan = document.createElement("span");
             const markSpan = document.createElement("span");
             const scoreSpan = document.createElement("span");
+            const activePlayerSpan = document.createElement("span");
             scoreSpan.classList.add("score");
             markSpan.classList.add("mark");
+            activePlayerSpan.classList.add("active-player");            
 
             DOMelements.dataDiv.appendChild(playerPar);
             playerPar.appendChild(nameSpan);
             playerPar.appendChild(markSpan);
             playerPar.appendChild(scoreSpan);
+            playerPar.appendChild(activePlayerSpan);
 
             nameSpan.textContent = player.name.toUpperCase() + ":";
             markSpan.classList.add(player.mark.toLowerCase());
             scoreSpan.textContent = player.score;
+
+            //display turn
+            const activePlayer = game.getActivePlayer().mark;
+            if(player.mark === activePlayer) {
+                activePlayerSpan.textContent = "MY TURN"
+            }
+
         });
+
+
+
+        
 
         //fill the cells
         DOMelements.buttonCells.forEach((button, index) => {
