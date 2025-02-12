@@ -124,8 +124,8 @@ function GameController(){
 
         board.addMark(index, activePlayer.mark);
 
-        checkWin(index, activePlayer.mark);
         checkTie();
+        checkWin(index, activePlayer.mark);
         if(status.value){
             if(status.value=== "win") updateScore();
             switchPlayerTurn();
