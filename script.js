@@ -1,7 +1,7 @@
 //Gameboard represents the state of the board. Each square holds a cell, defined later
 function Gameboard(){
     const cells = 9;
-    let board;
+    let board = [];
     const winningCombos = [ 
         [0,1,2],
         [3,4,5],
@@ -102,7 +102,6 @@ function GameController(){
 
     const checkTie = () => {
         const emptyCells = board.getBoard().filter(cell => cell.getValue() === "");
-        console.log(emptyCells)
         if(emptyCells.length === 0) status.value = "tie";
     }
 
@@ -135,11 +134,11 @@ function GameController(){
         return status;
     } 
 
-    return { playRound, getActivePlayer, getBoard: board.getBoard, getWinningCombos: board.getWinningCombos, getGameStatus, roundOver: board.roundOver, getPlayersData: playersController.getPlayers, setPlayerData: playersController.setData, roundOver, checkTie };
+    return { playRound, getActivePlayer, getBoard: board.getBoard, clearBoard: board.clearBoard, getWinningCombos: board.getWinningCombos, getGameStatus, roundOver: board.roundOver, getPlayersData: playersController.getPlayers, setPlayerData: playersController.setData, roundOver, checkTie };
 }
 
 function screenController(){
-    const game = GameController();
+    let game = GameController();
     //cache DOM elements
     const DOMelements = (function cacheDOM(){
         const body = document.querySelector("body");
@@ -153,8 +152,9 @@ function screenController(){
         const form = dialog.querySelector(".first-form");
         const secondForm = dialogsContainer.querySelector(".second-form")
         const confirmButtons = dialogsContainer.querySelectorAll(".confirm button");
-        const intro = document.querySelector(".intro")
-        return { container, boardDiv, cells, dataDiv, form, confirmButtons, dialog, dialogsContainer, body, intro, buttonCells, secondForm };
+        const intro = document.querySelector(".intro");
+        const restartButton = container.querySelector(".restart button"); 
+        return { container, boardDiv, cells, dataDiv, form, confirmButtons, dialog, dialogsContainer, body, intro, buttonCells, secondForm, restartButton };
     }());
 
     function updateSreen(){  
@@ -193,10 +193,6 @@ function screenController(){
             if(player.mark === activePlayer) activePlayerSpan.textContent = "MY TURN";
         });
 
-
-
-        
-
         //fill the cells
         DOMelements.buttonCells.forEach((button, index) => {
                 button.dataset.index = index;
@@ -228,17 +224,17 @@ function screenController(){
             return;
         }
 
-        //else insert marker
-        const selectedCell = event.target.dataset.index;
-        
         //make sure we click on the cell and not in the spaces between
         if(!event.target.dataset.index) return;
 
+        //else insert marker
+        const selectedCell = event.target.dataset.index;
+        
+        
         status = game.playRound(selectedCell);
-        console.log(status)
         if(status.value === "win") showWin(status.index);
         if(status.value === "tie") showTie();
-        updateSreen();  
+        updateSreen();
     }
 
     function getDialogData(dialog){
@@ -271,9 +267,16 @@ function screenController(){
         ["keypress", "click"].forEach(event => DOMelements.body.removeEventListener(event, bodyHandler))
     }
 
+    function restart() {
+        DOMelements.cells.forEach(cell => cell.removeAttribute("class"));
+        DOMelements.dialog.show();
+        game = GameController();
+    }
+
     DOMelements.boardDiv.addEventListener("click", boardClickHandler);
     DOMelements.form.addEventListener("submit", formClickHandler);
     DOMelements.secondForm.addEventListener("submit", formClickHandler);
+    DOMelements.restartButton.onclick = restart;
     ["keypress", "click"].forEach(event => DOMelements.body.addEventListener(event, bodyHandler));
 
 }
