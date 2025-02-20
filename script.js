@@ -253,9 +253,11 @@ function screenController(){
         dialog.close();
         if(event.target.dataset.last) {
             DOMelements.container.removeAttribute("hidden");
+            event.target.reset();
             updateSreen();
             return;
         }
+        event.target.reset();
         const nextDialog = dialog.parentElement.querySelector(`dialog:nth-child(2)`);
         nextDialog.show();
     }
@@ -270,6 +272,7 @@ function screenController(){
     function restart() {
         DOMelements.cells.forEach(cell => cell.removeAttribute("class"));
         DOMelements.dialog.show();
+        DOMelements.container.setAttribute("hidden", "");
         game = GameController();
     }
 
